@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro Timer</title>
+
+  <!-- Fuente Pixel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: "Pixelify Sans", sans-serif;
+      background: #ff6363;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    #timer {
+      font-size: 80px;
+      margin: 20px 0;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    button img {
+      height: 60px;
+      image-rendering: pixelated;
+      transition: transform 0.2s ease;
+    }
+
+    button img:hover {
+      transform: scale(1.1);
+    }
+
+    .reset-btn {
+      font-family: "Pixelify Sans", sans-serif;
+      font-size: 24px;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      color: #ffdede;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Pomodoro Timer</h1>
+
+  <div id="timer">25:00</div>
+
+  <div class="controls">
+    <button onclick="startTimer()" id="start-btn">
+      <img src="img/start.png" alt="Iniciar">
+    </button>
+
+    <button onclick="pauseTimer()" id="pause-btn" style="display: none;">
+      <img src="img/pause.png" alt="Pausar">
+    </button>
+
+    <button onclick="resetTimer()" class="reset-btn">
+      REINICIAR
+    </button>
+  </div>
+
+  <!-- Sonido -->
+  <audio id="alarm-sound" src="Ding.mp3" preload="auto"></audio>
+
+  <script>
+    let workTime = 25 * 60;
+    let breakTime = 5 * 60;
+    let isRunning = false;
+    let isWork = true;
+    let timeLeft = workTime;
+    let timerInterval;
+
+    const audio = document.getElementById('alarm-sound');
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      startBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateDisplay();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          isRunning = false;
+          startBtn.style.display = 'inline-block';
+          pauseBtn.style.display = 'none';
+          audio.play();
+          isWork = !isWork;
+          timeLeft = isWork ? workTime : breakTime;
+          alert(isWork ? '¡Hora de trabajar!' : '¡Tómate un descanso!');
+          updateDisplay();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      startBtn.style.display = 'inline-block';
+      pauseBtn.style.display = 'none';
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      isWork = true;
+      timeLeft = workTime;
+      updateDisplay();
+      startBtn.style.display = 'inline-block';
+      pauseBtn.style.display = 'none';
+    }
+
+    updateDisplay();
+  </script>
+
+</body>
+</html>
